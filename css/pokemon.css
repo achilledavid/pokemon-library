@@ -1,0 +1,155 @@
+.container {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.pokemon {
+  max-width: 80%;
+  flex: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.pokemon .head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pokemon .head .number {
+  font-weight: 600;
+}
+.pokemon .head h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  flex: 1;
+  text-align: center;
+}
+.pokemon .head .types {
+  display: flex;
+  gap: 8px;
+}
+.pokemon .head .types li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #F2F2F2;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.pokemon .head .types li p {
+  font-weight: 500;
+}
+.pokemon .head .types li img {
+  max-width: 16px;
+}
+.pokemon .image {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 16px;
+}
+.pokemon .image img {
+  max-width: 400px;
+}
+.pokemon .stats {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+.pokemon .stats h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.pokemon .stats ul {
+  border-radius: 4px;
+  overflow: hidden;
+}
+.pokemon .stats ul li {
+  padding: 8px 12px;
+}
+.pokemon .stats ul li:nth-child(odd) {
+  background-color: #F2F2F2;
+}
+.pokemon .stats ul li:nth-child(even) {
+  background-color: var(--white);
+}
+.pokemon .stats ul li strong {
+  font-weight: 500;
+}
+
+.evolutions {
+  max-width: 20%;
+  flex: 20%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.evolutions h2 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.evolutions ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow: auto;
+}
+.evolutions ul li {
+  position: relative;
+}
+.evolutions ul li a,
+.evolutions ul li div {
+  background-color: #F2F2F2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 4px;
+}
+.evolutions ul li a img,
+.evolutions ul li div img {
+  padding: 8px;
+  max-width: 64px;
+  object-fit: cover;
+}
+.evolutions ul li a p,
+.evolutions ul li div p {
+  font-weight: 500;
+}
+.evolutions ul li a:hover {
+  background-color: hsl(0, 0%, 92%);
+}
+.evolutions ul li div {
+  cursor: default;
+}
+.evolutions ul li.arrow::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 24px;
+  background-color: var(--white);
+  background-image: url("../icons/angle-down-solid.svg");
+  background-repeat: no-repeat;
+  background-size: 12px;
+  background-position: top calc(50% + 1px) center;
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+@media screen and (max-width: 1150px) {
+  .container {
+    flex-direction: column;
+  }
+  .container .pokemon,
+  .container .evolutions {
+    max-width: 100%;
+    flex: 1;
+  }
+}
+
+/*# sourceMappingURL=pokemon.css.map */

@@ -1,0 +1,248 @@
+// .pokemon {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 24px;
+
+//     h1 {
+//         font-size: 1rem;
+//         font-weight: 600;
+//     }
+
+//     img {
+//         max-width: 200px;
+//     }
+
+//     h2 {
+//         font-size: 1rem;
+//     }
+
+//     .types {
+//         display: flex;
+//         flex-direction: column;
+//         gap: 8px;
+
+//         ul {
+//             display: flex;
+//             flex-direction: column;
+//             gap: 8px;
+
+//             li {
+//                 display: inline-flex;
+//                 align-items: center;
+//                 gap: 4px;
+
+//                 img {
+//                     max-width: 16px;
+//                 }
+//             }
+//         }
+//     }
+
+//     .evolution,
+//     .pre-evolution,
+//     .stats,
+//     .title {
+//         display: flex;
+//         flex-direction: column;
+//         gap: 8px;
+//     }
+
+//     .stats {
+//         ul {
+//             display: flex;
+//             flex-direction: column;
+//             gap: 4px;
+
+//             li {
+//                 strong {
+//                     font-weight: 500;
+//                 }
+//             }
+
+//         }
+//     }
+// }
+
+.container {
+    flex-direction: row;
+    gap: 16px;
+}
+
+.pokemon {
+    max-width: 80%;
+    flex: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .number {
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+        }
+
+        .types {
+            display: flex;
+            gap: 8px;
+
+            li {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                background-color: #F2F2F2;
+                padding: 4px 8px;
+                border-radius: 4px;
+
+                p {
+                    font-weight: 500;
+                }
+
+                img {
+                    max-width: 16px;
+                }
+            }
+        }
+    }
+
+    .image {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        gap: 16px;
+
+        img {
+            max-width: 400px;
+        }
+    }
+
+    .stats {
+        display: flex;
+        gap: 8px;
+        flex-direction: column;
+
+        h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        ul {
+            border-radius: 4px;
+            overflow: hidden;
+
+            li {
+                padding: 8px 12px;
+
+                &:nth-child(odd) {
+                    background-color: #F2F2F2;
+                }
+
+                &:nth-child(even) {
+                    background-color: var(--white);
+                }
+
+                strong {
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+
+}
+
+.evolutions {
+    max-width: 20%;
+    flex: 20%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h2 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        overflow: auto;
+
+        li {
+            position: relative;
+
+            a,
+            div {
+                background-color: #F2F2F2;
+                display: flex;
+                align-items: center;
+                width: 100%;
+                border-radius: 4px;
+
+                img {
+                    padding: 8px;
+                    max-width: 64px;
+                    object-fit: cover;
+                }
+
+                p {
+                    font-weight: 500;
+                }
+            }
+
+            a {
+                &:hover {
+                    background-color: hsl(0, 0%, 92%);
+                }
+            }
+
+            div {
+                cursor: default;
+            }
+
+            &.arrow {
+                &::after {
+                    content: '';
+                    display: block;
+                    $size: 24px;
+                    width: $size;
+                    height: $size;
+                    background-color: var(--white);
+                    background-image: url('../icons/angle-down-solid.svg');
+                    background-repeat: no-repeat;
+                    background-size: 12px;
+                    background-position: top calc(50% + 1px) center;
+                    position: absolute;
+                    bottom: calc((($size / 2) * -1) - 4px);
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 1;
+                    border-radius: 4px;
+                    pointer-events: none;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width:1150px) {
+    .container {
+        flex-direction: column;
+
+        .pokemon,
+        .evolutions {
+            max-width: 100%;
+            flex: 1
+        }
+    }
+}
