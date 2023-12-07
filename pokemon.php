@@ -14,6 +14,7 @@ if ($conn->connect_error) {
 
 $pokemonId = isset($_GET['id']) ? $_GET['id'] : null;
 $evolutions = [];
+$stats = [];
 
 $statsLabels = [
     "HP" => "PV",
@@ -26,7 +27,7 @@ $statsLabels = [
 
 function getPokemonInfos($pokemonId)
 {
-    global $conn;
+    global $conn, $stats;
     $stmt = $conn->prepare("SELECT pokemons.*, GROUP_CONCAT(types.name) as types FROM pokemons LEFT JOIN pokemonsTypes ON pokemons.id = pokemonsTypes.pokemonId LEFT JOIN types ON pokemonsTypes.typeName = types.name WHERE pokemons.id = ? GROUP BY pokemons.id");
     $stmt->bind_param("s", $pokemonId);
     $stmt->execute();
@@ -36,6 +37,7 @@ function getPokemonInfos($pokemonId)
         $pokemonData = $result->fetch_object();
         $pokemonData->apiTypes = [];
         $types = explode(",", $pokemonData->types);
+        $stats = getStatsFromDatabase($pokemonData->id);
 
         foreach ($types as $type) {
             $pokemonData->apiTypes[] = (object) [
@@ -50,6 +52,7 @@ function getPokemonInfos($pokemonId)
         $url = "https://pokebuildapi.fr/api/v1/pokemon/$pokemonId";
         $response = file_get_contents($url);
         $pokemonData = json_decode($response);
+        if (isset($pokemonData->stats)) $stats = $pokemonData->stats;
         addPokemonToDatabase($pokemonData);
         return $pokemonData;
     }
@@ -63,9 +66,10 @@ function addPokemonToDatabase($pokemonData)
     $spriteUrl = $pokemonData->sprite;
     $spritePath = "./sprites/$pokemonData->id.png";
     $preEvolutionId = $pokemonData->apiPreEvolution->pokedexIdd ?? null;
-    if ($preEvolutionId) $sql = "INSERT INTO pokemons (id, name, image, apiGeneration, sprite, preEvolutionId) VALUES ('$pokemonData->id', '$pokemonData->name', './images/$pokemonData->id.png', '$pokemonData->apiGeneration', './sprites/$pokemonData->id.png', '$preEvolutionId' )";
-    else $sql = "INSERT INTO pokemons (id, name, image, apiGeneration, sprite) VALUES ('$pokemonData->id', '$pokemonData->name', './images/$pokemonData->id.png', '$pokemonData->apiGeneration', './sprites/$pokemonData->id.png' )";
+    if ($preEvolutionId) $sql = "INSERT INTO pokemons (id, name, image, apiGeneration, sprite, preEvolutionId, statsId) VALUES ('$pokemonData->id', '$pokemonData->name', './images/$pokemonData->id.png', '$pokemonData->apiGeneration', './sprites/$pokemonData->id.png', '$preEvolutionId', '$pokemonData->id')";
+    else $sql = "INSERT INTO pokemons (id, name, image, apiGeneration, sprite, statsId) VALUES ('$pokemonData->id', '$pokemonData->name', './images/$pokemonData->id.png', '$pokemonData->apiGeneration', './sprites/$pokemonData->id.png', '$pokemonData->id')";
     if ($conn->query($sql) === TRUE) {
+        addStatsToDatabase($pokemonData);
         saveImage($imageUrl, $imagePath);
         saveImage($spriteUrl, $spritePath);
         if (isset($pokemonData->apiTypes)) {
@@ -203,6 +207,51 @@ function saveImage($url, $path)
     $image = file_get_contents($url);
     file_put_contents($path, $image);
 }
+
+function getStatsFromDatabase($pokemonId)
+{
+    global $conn;
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM pokemonStats WHERE id = ?");
+
+    if ($stmt === false) {
+        die('Erreur de préparation de la requête SQL : ' . $conn->error);
+    }
+
+    $stmt->bind_param("i", $pokemonId);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    if ($result === false) {
+        die('Erreur d\'exécution de la requête SQL : ' . $stmt->error);
+    }
+
+    $stats = $result->fetch_object();
+
+    unset($stats->id);
+
+    $stmt->close();
+
+    return $stats;
+}
+
+
+function addStatsToDatabase($pokemonData)
+{
+    global $conn, $stats;
+    $pokemonId = $pokemonData->id;
+    $stats = $pokemonData->stats;
+
+    $sql = "INSERT INTO pokemonStats (id, HP, attack, defense, special_attack, special_defense, speed) VALUES ('$pokemonId', '$stats->HP', '$stats->attack', '$stats->defense', '$stats->special_attack', '$stats->special_defense', '$stats->speed')";
+    if ($conn->query($sql) === TRUE) {
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -266,9 +315,8 @@ function saveImage($url, $path)
                                 <strong>Génération</strong> : <?= $pokemonData->apiGeneration ?>
                             </li>
                             <?php
-                            if (isset($pokemonData->stats)) {
-
-                                foreach ($pokemonData->stats as $statName => $statValue) {
+                            if (isset($stats)) {
+                                foreach ($stats as $statName => $statValue) {
                             ?>
                                     <li>
                                         <?= getFormattedStat($statName, $statValue) ?>
@@ -318,20 +366,20 @@ function saveImage($url, $path)
                         }
                         ?>
                         </li>
+                        <form action="delete.php" method="post">
+                            <input type="hidden" name="id" value="<?= $pokemonData->id ?>">
+                            <button type="submit" class="red" style="width: 100%;">Supprimer</button>
+                        </form>
                     </ul>
                 </div>
             <?php
             } else {
-            ?>
-                <h1>Aucun pokémon trouvé</h1>
-            <?php
+                echo "<script>window.location.href = '404.php'</script>";
             }
             ?>
         <?php
         } else {
-        ?>
-            <h1>Numéro du pokémon invalide</h1>
-        <?php
+            echo "<script>window.location.href = '404.php'</script>";
         }
         $conn->close();
         ?>
